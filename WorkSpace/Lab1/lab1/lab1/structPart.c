@@ -1,19 +1,21 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #define STRING_SIZE 20
 
-struct Student
+struct Student_s
 {
+	int gradebook;
 	char surname[STRING_SIZE];
 	char name[STRING_SIZE];
 	char faculty[STRING_SIZE];
-	int gradebook;
+	
 
-} StudentDefault = {"\n", "\n", "\n", -1};
+} StudentDefault = {-1, "\n", "\n", "\n" };
 
-typedef struct Student Student;
+typedef struct Student_s Student;
 
 Student CreateNewStudent()
 {
@@ -37,13 +39,13 @@ Student CreateNewStudent()
 	return newStudent;
 }
 
-Student* FindSudentByName(Student inst[], int instSize, Student wantFind)
+Student* FindSudentByName(Student* inst, int instSize, Student wantFind)
 {
 	Student tester = StudentDefault;
 
 	for (int i = 0; i < instSize; i++)
 	{
-		Student cur = inst[i];
+		Student cur = *(inst + i*sizeof(Student));
 		if (strcmp(tester.name, wantFind.name) != 0)
 			if (strcmp(cur.name, wantFind.name) != 0)
 				continue;
@@ -70,12 +72,16 @@ void Part2()
 {
 	fseek(stdin, 0, SEEK_END);
 	printf("----------\n");
+
 	int instSize = 2;
-	Student institute[2] = { 0 };
+	printf("Count od students: ");
+	scanf("%d", &instSize);
+	fseek(stdin, 0, SEEK_END);
+	Student* institute = (Student*)malloc(instSize * sizeof(Student));
 	for (int i = 0; i < instSize; i++)
 	{
 		printf("----------\n");
-		institute[i] = CreateNewStudent();
+		*(institute + i* sizeof(Student)) = CreateNewStudent();
 		printf("----------\n");
 	}
 
@@ -95,4 +101,6 @@ void Part2()
 	printf("Student Finded:\nname %ssurname %sfaculty %sgradebook %d\n", stud.name, stud.surname, stud.faculty, stud.gradebook);
 	printf("----------\n");
 	printf("----------\n");
+
+	free(institute);
 }
