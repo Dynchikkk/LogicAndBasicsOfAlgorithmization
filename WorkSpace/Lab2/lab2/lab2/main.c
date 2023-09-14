@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <time.h>
 
-#define ARRAY_SIZE_1 100
-#define ARRAY_SIZE_2 1000000
+#define ARRAY_SIZE_1 1000
+#define ARRAY_SIZE_2 100000
 
 #pragma region Exercize1
 int** CreateDoubleArray(int size)
@@ -178,7 +178,6 @@ void TestSpeedDefault()
 }
 #pragma endregion
 
-
 double CalculateSpeed(void (*func)())
 {
 	double time_spent = 0.0;
@@ -198,7 +197,6 @@ int main()
 	printf("----- Exercize 1 -----\n");
 	printf("Time spend: %fsec\n", CalculateSpeed(Exercize1));
 
-	//
 	printf("\n----- Exercize 2 -----\n");
 	printf("--Random Array--\n");
 	RandomArray();
