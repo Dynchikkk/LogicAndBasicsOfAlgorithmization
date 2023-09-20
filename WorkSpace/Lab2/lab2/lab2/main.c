@@ -2,8 +2,19 @@
 #include <stdlib.h>
 #include <time.h>
 
-#define ARRAY_SIZE_1 1000
-#define ARRAY_SIZE_2 100000
+#define ARRAY_SIZE_1 100
+
+double CalculateSpeed(void (*func)())
+{
+	double time_spent = 0.0;
+
+	clock_t begin = clock();
+	func();
+	clock_t end = clock();
+
+	time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
+	return time_spent;
+}
 
 #pragma region Exercize1
 int** CreateDoubleArray(int size)
@@ -128,67 +139,98 @@ int* CopyArray(int* from, int size)
 	return to;
 }
 
-int array1[ARRAY_SIZE_2] = { 0 };
+int* array1;
 int* array2;
+int* array3;
+int sizeDefault = 100;
 
-void RandomArray()
+void RandomArray(int size)
 {
-	for (int i = 0; i < ARRAY_SIZE_2; i++)
+	for (int i = 0; i < size; i++)
 		array1[i] = rand() % 100 + 1;
-	array2 = CopyArray(array1, ARRAY_SIZE_2);
+	array2 = CopyArray(array1, size);
+	array3 = CopyArray(array1, size);
 }
 
-void UpArray()
+void UpArray(int size)
 {
-	for (int i = 0; i < ARRAY_SIZE_2; i++)
+	for (int i = 0; i < size; i++)
 		array1[i] = i;
-	array2 = CopyArray(array1, ARRAY_SIZE_2);
+	array2 = CopyArray(array1, size);
+	array3 = CopyArray(array1, size);
 }
 
-void DownArray()
+void DownArray(int size)
 {
-	for (int i = 0, j = ARRAY_SIZE_2 - 1; i < ARRAY_SIZE_2; i++, j--)
+	for (int i = 0, j = size - 1; i < size; i++, j--)
 		array1[i] = j;
-	array2 = CopyArray(array1, ARRAY_SIZE_2);
+	array2 = CopyArray(array1, size);
+	array3 = CopyArray(array1, size);
 }
 
-void SplitArray()
+void SplitArray(int size)
 {
-	int secondPart = ARRAY_SIZE_2 - ARRAY_SIZE_2 * 0.5;
+	int secondPart = size - size * 0.5;
 	for (int i = 0; i < secondPart; i++)
 		array1[i] = i;
-	for (int i = secondPart, j = ARRAY_SIZE_2 - 1; i < ARRAY_SIZE_2; i++, j--)
+	for (int i = secondPart, j = size - 1; i < size; i++, j--)
 		array1[i] = j;
-	array2 = CopyArray(array1, ARRAY_SIZE_2);
+	array2 = CopyArray(array1, size);
+	array3 = CopyArray(array1, size);
 }
 
 void TestSpeedShell()
 {
-	shell(array1, ARRAY_SIZE_2);
+	shell(array1, sizeDefault);
 }
 
 void TestSpeedQs()
 {
-	qs(array2, 0, ARRAY_SIZE_2 - 1);
+	qs(array2, 0, sizeDefault - 1);
+}
+
+int compare(const void* x1, const void* x2)   // функция сравнения элементов массива
+{
+	return (*(int*)x1 - *(int*)x2);              // если результат вычитания равен 0, то числа равны, < 0: x1 < x2; > 0: x1 > x2
 }
 
 void TestSpeedDefault()
 {
-	//qsort(array1, )
+	qsort(array3, sizeDefault, sizeof(int), compare);
+}
+
+void autoTest(int size)
+{
+	array1 = (int*)malloc(size * sizeof(int));
+	sizeDefault = size;
+	printf("----- Size %d -----\n", size);
+	printf("--Random Array--\n");
+	RandomArray(size);
+	printf("Shell sort: %fsec\n", CalculateSpeed(TestSpeedShell));
+	printf("Quick sort: %fsec\n", CalculateSpeed(TestSpeedQs));
+	printf("Default c sort: %fsec\n", CalculateSpeed(TestSpeedDefault));
+
+	printf("--Raise Array--\n");
+	UpArray(size);
+	printf("Shell sort: %fsec\n", CalculateSpeed(TestSpeedShell));
+	printf("Quick sort: %fsec\n", CalculateSpeed(TestSpeedQs));
+	printf("Default c sort: %fsec\n", CalculateSpeed(TestSpeedDefault));
+
+	printf("--Down Array--\n");
+	DownArray(size);
+	printf("Shell sort: %fsec\n", CalculateSpeed(TestSpeedShell));
+	printf("Quick sort: %fsec\n", CalculateSpeed(TestSpeedQs));
+	printf("Default c sort: %fsec\n", CalculateSpeed(TestSpeedDefault));
+
+	printf("--Split Array--\n");
+	SplitArray(size);
+	printf("Shell sort: %fsec\n", CalculateSpeed(TestSpeedShell));
+	printf("Quick sort: %fsec\n", CalculateSpeed(TestSpeedQs));;
+	printf("Default c sort: %fsec\n", CalculateSpeed(TestSpeedDefault));
+
+	printf("\n");
 }
 #pragma endregion
-
-double CalculateSpeed(void (*func)())
-{
-	double time_spent = 0.0;
-
-	clock_t begin = clock();
-	func();
-	clock_t end = clock();
-
-	time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
-	return time_spent;
-}
 
 int main()
 {
@@ -198,25 +240,10 @@ int main()
 	printf("Time spend: %fsec\n", CalculateSpeed(Exercize1));
 
 	printf("\n----- Exercize 2 -----\n");
-	printf("--Random Array--\n");
-	RandomArray();
-	printf("Shell sort: %fsec\n", CalculateSpeed(TestSpeedShell));
-	printf("Quick sort: %fsec\n", CalculateSpeed(TestSpeedQs));
-
-	printf("--Raise Array--\n");
-	UpArray();
-	printf("Shell sort: %fsec\n", CalculateSpeed(TestSpeedShell));
-	printf("Quick sort: %fsec\n", CalculateSpeed(TestSpeedQs));
-
-	printf("--Down Array--\n");
-	DownArray();
-	printf("Shell sort: %fsec\n", CalculateSpeed(TestSpeedShell));
-	printf("Quick sort: %fsec\n", CalculateSpeed(TestSpeedQs));
-
-	printf("--Split Array--\n");
-	SplitArray();
-	printf("Shell sort: %fsec\n", CalculateSpeed(TestSpeedShell));
-	printf("Quick sort: %fsec\n", CalculateSpeed(TestSpeedQs));;
+	for (int i = 0; i < 100000; i+= 10000)
+	{
+		autoTest(i);
+	}
 
 	return 0;
 }
