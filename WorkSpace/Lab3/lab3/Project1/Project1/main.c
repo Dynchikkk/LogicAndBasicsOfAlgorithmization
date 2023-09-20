@@ -79,16 +79,16 @@ int main()
 	Push(100, s);
 
 	int valS = 0;
-	s = Dequeue(s, &valS);
+	s = Pop(s, &valS);
 	printf("%d\n", valS);
-	s = Dequeue(s, &valS);
+	s = Pop(s, &valS);
 	printf("%d\n", valS);
-	s = Dequeue(s, &valS);
+	s = Pop(s, &valS);
 	printf("%d\n", valS);
-	s = Dequeue(s, &valS);
+	s = Pop(s, &valS);
 	printf("%d\n", valS);
-	s = Dequeue(s, &valS);
-	s = Dequeue(s, &valS);
+	s = Pop(s, &valS);
+	s = Pop(s, &valS);
 #pragma endregion
 
 	return 0;

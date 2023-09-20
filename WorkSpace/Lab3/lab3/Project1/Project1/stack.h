@@ -4,8 +4,8 @@
 
 DataType* CreateStack(int data);
 
-void Push(int num, DataType* prQueue);
+void Push(int num, DataType* stack);
 
-DataType* Pop(DataType* prQueue, int val);
+DataType* Pop(DataType* stack, int* val);
 
 #endif
