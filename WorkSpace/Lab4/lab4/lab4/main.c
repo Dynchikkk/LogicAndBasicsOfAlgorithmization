@@ -15,11 +15,12 @@ int main()
 	root = AddNode(100, root);
 	root = AddNode(60, root);
 	root = AddNode(110, root);
-
 	TreePrint(root, 0);
 
+	printf("---- Finded node ----\n");
 	Tree* find = SearchNode(100, root);
 	PrintOneNode(find);
+	printf("---------------------\n");
 
 	printf("Entry count of %d: %d\n", 19, EntryCount(19, root, 0));
 
