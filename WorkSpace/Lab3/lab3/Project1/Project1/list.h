@@ -22,5 +22,7 @@ void PrintDataType(DataType* head);
 
 int* GetLength(DataType* head);
 
+DataType* Clear(DataType* head);
+
 #endif
 
