@@ -28,6 +28,8 @@ int main()
 	l = TryRemoveElementAt(0, l);
 	l = TryRemoveElementAt(0, l);
 	l = TryRemoveElementAt(0, l);
+
+	l = Clear(l);
 #pragma endregion
 
 #pragma region prior queue
@@ -36,6 +38,8 @@ int main()
 	EnqueuePr(20, pQ);
 	EnqueuePr(10, pQ);
 	EnqueuePr(100, pQ);
+
+	PrintDataType(pQ);
 
 	int valPQ = 0;
 	pQ = DequeuePr(pQ, &valPQ);
@@ -48,6 +52,7 @@ int main()
 	printf("%d\n", valPQ);
 	pQ = DequeuePr(pQ, &valPQ);
 	pQ = DequeuePr(pQ, &valPQ);
+	pQ = Clear(pQ);
 #pragma endregion
 
 #pragma region queue
@@ -56,6 +61,7 @@ int main()
 	Enqueue(20, q);
 	Enqueue(10, q);
 	Enqueue(100, q);
+	PrintDataType(q);
 
 	int valQ = 0;
 	q = Dequeue(q, &valQ);
@@ -68,6 +74,7 @@ int main()
 	printf("%d\n", valQ);
 	q = Dequeue(q, &valQ);
 	q = Dequeue(q, &valQ);
+	q = Clear(q);
 #pragma endregion
 
 #pragma region stack
@@ -77,6 +84,7 @@ int main()
 	Push(20, s);
 	Push(10, s);
 	Push(100, s);
+	PrintDataType(s);
 
 	int valS = 0;
 	s = Pop(s, &valS);
@@ -89,6 +97,7 @@ int main()
 	printf("%d\n", valS);
 	s = Pop(s, &valS);
 	s = Pop(s, &valS);
+	s = Clear(s);
 #pragma endregion
 
 	return 0;

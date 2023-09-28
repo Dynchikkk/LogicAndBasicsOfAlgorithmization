@@ -5,6 +5,13 @@
 DataType* CreateElement(int data)
 {
 	DataType* tmp = (DataType*)malloc(sizeof(DataType));
+
+	if (tmp == NULL)
+	{
+		printf("ERROR: No memory");
+		return NULL;
+	}
+
 	tmp->value = data;
 	tmp->next = NULL;
 
@@ -21,7 +28,8 @@ int IsDataTypeNull(DataType* head)
 
 DataType* CreateDataType(int data)
 {
-	return CreateElement(data);
+	DataType* tmp = CreateElement(data);
+	return tmp;
 }
 
 void Add(int data, DataType* head)
@@ -33,6 +41,8 @@ void Add(int data, DataType* head)
 	}
 
 	DataType* tmp = CreateElement(data);
+	if (tmp == NULL)
+		return;
 
 	DataType* l = head;
 
@@ -53,6 +63,8 @@ DataType* TryAddElementAt(int data, int pos, DataType* head)
 	}
 
 	DataType* tmp = CreateElement(data);
+	if (tmp == NULL)
+		return head;
 
 	if (pos == 0)
 	{
@@ -166,5 +178,20 @@ int* GetLength(DataType* head)
 	}
 
 	return &count;
+}
+
+DataType* Clear(DataType* dataType)
+{
+	int* length = GetLength(dataType);
+	if (length == NULL)
+		return;
+		
+	DataType* h = dataType;
+	for (int i = 0; i < *length; i++)
+	{
+		h = TryRemoveElementAt(0, h);
+	}
+
+	return h;
 }
 
