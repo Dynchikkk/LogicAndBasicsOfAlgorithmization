@@ -109,3 +109,13 @@ void PrintOneNode(Tree* node)
 	printf("\n");
 }
 
+void TreeWalk(Tree* root)
+{
+	if (root == NULL)
+		return;
+
+	printf("%d ", root->value);
+	TreeWalk(root->left);
+	TreeWalk(root->right);
+}
+
