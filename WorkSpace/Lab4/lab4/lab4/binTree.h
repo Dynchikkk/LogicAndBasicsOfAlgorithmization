@@ -21,5 +21,7 @@ void ClearTree(Tree* root);
 
 void PrintOneNode(Tree* root);
 
+void TreeWalk(Tree* root);
+
 #endif 
 

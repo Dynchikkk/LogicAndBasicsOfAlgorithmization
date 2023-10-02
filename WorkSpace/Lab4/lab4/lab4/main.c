@@ -5,6 +5,7 @@ int main()
 {
 	Tree* root = CreateTree(50);
 
+	printf("---- Tree print ----\n");
 	root = AddNode(10, root);
 	root = AddNode(12, root);
 	root = AddNode(11, root);
@@ -20,9 +21,12 @@ int main()
 	printf("---- Finded node ----\n");
 	Tree* find = SearchNode(100, root);
 	PrintOneNode(find);
-	printf("---------------------\n");
 
+	printf("---- Entry count ----\n");
 	printf("Entry count of %d: %d\n", 19, EntryCount(19, root, 0));
+
+	printf("---- Tree walk ----\n");
+	TreeWalk(root);
 
 	ClearTree(root);
 
