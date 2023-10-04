@@ -46,7 +46,7 @@ int main(){
 	CheckIncPeaks(matrixInc, MATRIX_SIZE, r);
 
 	ClearMatrix(matrixAdj, MATRIX_SIZE);
-	ClearMatrix(matrixInc, r);
+	ClearMatrix(matrixInc, MATRIX_SIZE);
 
 	return 0;
 }
@@ -128,23 +128,14 @@ int** GenerateAdjacencyMatrix(int size)
 int CalculateAdjSize(int** matrix, int size)
 {
 	int count = 0;
-	int** rebra = GenerateMatrix(size, size);
-	for (int i = 0; i < size; i++)
-	{
-		for (int j = 0; j < size; j++)
-		{
-			rebra[i][j] = matrix[i][j];
-		}
-	}
 
 	for (int i = 0; i < size; i++)
 	{
-		for (int j = 0; j < size; j++)
+		for (int j = i; j < size; j++)
 		{
-			if (rebra[i][j] == 1)
+			if (matrix[i][j] == 1)
 			{
 				count++;
-				rebra[j][i] = 0;
 			}
 		}
 	}
@@ -157,7 +148,6 @@ void CheckAdjPeaks(int** matrix, int size)
 	int isolate = 0;
 	int end = 0;
 	int max = 0;
-	int maxCount = 0;
 
 	for (int i = 0; i < size; i++)
 	{
@@ -173,16 +163,15 @@ void CheckAdjPeaks(int** matrix, int size)
 		else if (c == 1)
 			end++;
 
-		if (c > maxCount)
+		if (c == size - 1)
 		{
-			maxCount = c;
 			max = i;
 		}
 	}
 
 	printf("Isolate peaks: %d\n", isolate);
 	printf("End peaks: %d\n", end);
-	printf("Dominant peaks: %d\n", max + 1);
+	printf("Dominant peaks: %d\n", max);
 }
 #pragma endregion
 
@@ -244,7 +233,6 @@ void CheckIncPeaks(int** matrix, int size_x, int size_y)
 	int isolate = 0;
 	int end = 0;
 	int max = 0;
-	int maxCount = 0;
 
 	for (int i = 0; i < size_x; i++)
 	{
@@ -260,15 +248,14 @@ void CheckIncPeaks(int** matrix, int size_x, int size_y)
 		else if (c == 1)
 			end++;
 
-		if (c > maxCount)
+		if (c == size_x - 1)
 		{
-			maxCount = c;
 			max = i;
 		}
 	}
 
 	printf("Isolate peaks: %d\n", isolate);
 	printf("End peaks: %d\n", end);
-	printf("Dominant peaks: %d\n", max + 1);
+	printf("Dominant peaks: %d\n", max);
 }
 #pragma endregion
