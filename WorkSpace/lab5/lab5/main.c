@@ -1,8 +1,10 @@
+#define _CRT_SECURE_NO_WARNINGS
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 
-#define MATRIX_SIZE 4
+#define MATRIX_SIZE 2
 
 int** GenerateMatrix(int size_x, int size_y);
 void ClearMatrix(int** matrix, int size);
@@ -20,33 +22,41 @@ void CheckIncPeaks(int** matrix, int size_x, int size_y);
 int main(){
 	srand(time(NULL));
 
+	int matrixSize = 0;
+	printf("Insert Matrix size: ");
+	scanf("%d", &matrixSize);
+	if (matrixSize < MATRIX_SIZE)
+		matrixSize = MATRIX_SIZE;
+
+	printf("\n---- GENERATING. SIZE %d ----\n\n", matrixSize);
+
 	printf("----- ADJACENCY MATRIX -----\n");
-	int** matrixAdj = GenerateAdjacencyMatrix(MATRIX_SIZE);
+	int** matrixAdj = GenerateAdjacencyMatrix(matrixSize);
 
 	printf("---- Print matrix ----\n");
-	PrintMatrix(matrixAdj, MATRIX_SIZE, MATRIX_SIZE);
+	PrintMatrix(matrixAdj, matrixSize, matrixSize);
 
 	printf("---- Calculate matrix size ----\n");
-	printf("Size: %d\n", CalculateAdjSize(matrixAdj, MATRIX_SIZE));
+	printf("Size: %d\n", CalculateAdjSize(matrixAdj, matrixSize));
 
 	printf("---- Peaks info ----\n");
-	CheckAdjPeaks(matrixAdj, MATRIX_SIZE);
+	CheckAdjPeaks(matrixAdj, matrixSize);
 
 	printf("\n----- INCEDENCE MATRIX -----\n");
-	int r = RebrCount(matrixAdj, MATRIX_SIZE);
-	int** matrixInc = GenerateIncidenceMatrix(matrixAdj, MATRIX_SIZE);
+	int r = RebrCount(matrixAdj, matrixSize);
+	int** matrixInc = GenerateIncidenceMatrix(matrixAdj, matrixSize);
 
 	printf("---- Print matrix ----\n");
-	PrintMatrix(matrixInc, MATRIX_SIZE, r);
+	PrintMatrix(matrixInc, matrixSize, r);
 
 	printf("---- Calculate matrix size ----\n");
-	printf("Size: %d\n", CalculateIncSize(matrixInc, MATRIX_SIZE, r));
+	printf("Size: %d\n", CalculateIncSize(matrixInc, matrixSize, r));
 
 	printf("---- Peaks info ----\n");
-	CheckIncPeaks(matrixInc, MATRIX_SIZE, r);
+	CheckIncPeaks(matrixInc, matrixSize, r);
 
-	ClearMatrix(matrixAdj, MATRIX_SIZE);
-	ClearMatrix(matrixInc, MATRIX_SIZE);
+	ClearMatrix(matrixAdj, matrixSize);
+	ClearMatrix(matrixInc, matrixSize);
 
 	return 0;
 }
@@ -102,6 +112,10 @@ void PrintMatrix(int** matrix, int size_x, int size_y)
 int** GenerateAdjacencyMatrix(int size)
 {
 	int** matrix = GenerateMatrix(size, size);
+	int chance = 50;
+	printf("Rebro spawn chance (0-100%): ");
+	scanf("%d", &chance);
+
 
 	if (matrix == NULL)
 		return NULL;
@@ -113,8 +127,11 @@ int** GenerateAdjacencyMatrix(int size)
 			if (i == j)
 				continue;
 
-			int rnd = rand() % 2;
-			int izolate = rand() % 2;
+			int rnd = rand() % 100;
+			if (rnd < chance)
+				rnd = 1;
+			else
+				rnd = 0;
 
 			matrix[i][j] = rnd;
 			if (rnd == 1)
@@ -165,7 +182,7 @@ void CheckAdjPeaks(int** matrix, int size)
 
 		if (c == size - 1)
 		{
-			max = i;
+			max++;
 		}
 	}
 
@@ -250,7 +267,7 @@ void CheckIncPeaks(int** matrix, int size_x, int size_y)
 
 		if (c == size_x - 1)
 		{
-			max = i;
+			max++;
 		}
 	}
 
