@@ -18,6 +18,10 @@ DataType** IdentificationL(DataType** matrix, int* size, int x, int y);
 DataType** TighteningL(DataType** matrix, int* size, int x, int y);
 DataType** SplittingL(DataType** matrix, int* size, int x, int y);
 
+int** Union(int** matrix1, int size1, int** matrix2, int size2, int* outSize);
+int** Intersection(int** matrix1, int size1, int** matrix2, int size2, int* outSize);
+int** RoundSum(int** matrix1, int size1, int** matrix2, int size2, int* outSize);
+
 int main()
 {
 	printf("--- Matrix 1 ---\n");
@@ -38,8 +42,8 @@ int main()
 	PrintMatrix(matrix2, matrixSize2, matrixSize2);
 	printf("-------\n");
 
-	DataType** matrixL1 = GenerateListMatrix(matrix1, matrixSize1);
-	DataType** matrixL2 = GenerateListMatrix(matrix2, matrixSize2); 
+	/*DataType** matrixL1 = GenerateListMatrix(matrix1, matrixSize1);
+	DataType** matrixL2 = GenerateListMatrix(matrix2, matrixSize2); */
 	/*printf("--- List Matrix 1---\n");
 	PrintListMatrix(matrixL1, matrixSize1);
 	printf("-------\n");*/
@@ -51,14 +55,26 @@ int main()
 	PrintMatrix(matrix2, matrixSize2, matrixSize2);*/
 	/*matrix2 = Tightening(matrix2, &matrixSize2, 0, 1);
 	PrintMatrix(matrix2, matrixSize2, matrixSize2);*/
-	matrix2 = Splitting(matrix2, &matrixSize2, 0, 1);
-	PrintMatrix(matrix2, matrixSize2, matrixSize2);
+	/*matrix2 = Splitting(matrix2, &matrixSize2, 0, 1);
+	PrintMatrix(matrix2, matrixSize2, matrixSize2);*/
 	/*matrixL2 = IdentificationL(matrixL2, &matrixSize2, 0, 3);
 	PrintListMatrix(matrixL2, matrixSize2);*/
 	/*matrixL2 = TighteningL(matrixL2, &matrixSize2,  0, 1);
 	PrintListMatrix(matrixL2, matrixSize2);*/
 	/*matrixL2 = SplittingL(matrixL2, &matrixSize2,  0, 1);
 	PrintListMatrix(matrixL2, matrixSize2);*/
+
+	/*int uSize = 0;
+	int** uMatrix = Union(matrix1, matrixSize1, matrix2, matrixSize2, &uSize);
+	PrintMatrix(uMatrix, uSize, uSize);*/
+
+	/*int iSize = 0;
+	int** iMatrix = Intersection(matrix1, matrixSize1, matrix2, matrixSize2, &iSize);
+	PrintMatrix(iMatrix, iSize, iSize);*/
+
+	int rsSize = 0;
+	int** rsMatrix = RoundSum(matrix1, matrixSize1, matrix2, matrixSize2, &rsSize);
+	PrintMatrix(rsMatrix, rsSize, rsSize);
 
 	return 0;
 }
@@ -116,6 +132,37 @@ void PrintListMatrix(DataType** matrix, int size)
 	{
 		PrintDataType(matrix[i]);
 	}
+}
+
+int** RemoveRebro(int** matrix, int* size, int r)
+{
+	int s = *size;
+	int** nMatrix = GenerateMatrix(s - 1, s - 1);
+	int di = 0, dj = 0;
+	for (size_t i = 0; i < s; i++)
+	{
+		if (i == r)
+			i++;
+		if (i >= s)
+			break;
+
+		for (size_t j = 0; j < s; j++)
+		{
+			if (j == r)
+				j++;
+			if (j >= s)
+				break;
+
+			nMatrix[di][dj] = matrix[i][j];
+			dj++;
+		}
+
+		di++;
+		dj = 0;
+	}
+
+	*size = s - 1;
+	return nMatrix;
 }
 #pragma endregion
 
@@ -460,6 +507,99 @@ DataType** SplittingL(DataType** matrix, int* size, int x, int y)
 }
 
 #pragma endregion
+
+#pragma region Third Number
+
+
+int** Union(int** matrix1, int size1, int** matrix2, int size2, int* outSize)
+{
+	int bSize = (size1 > size2) ? size1 : size2;
+	int** bMatrix = (size1 > size2) ? matrix1 : matrix2;
+
+	int lSize = (size1 > size2) ? size2 : size1;
+	int** lMatrix = (size1 > size2) ? matrix2 : matrix1;
+
+	int** uMatrix = GenerateMatrix(bSize, bSize);
+
+	for (size_t i = 0; i < bSize; i++)
+	{
+		for (size_t j = 0; j < bSize; j++)
+		{
+			int res = 0;
+			if (i >= lSize || j >= lSize)
+				res = bMatrix[i][j];
+			else
+				res = lMatrix[i][j] + bMatrix[i][j] >= 1 ? 1 : 0;
+			uMatrix[i][j] = res;
+		}
+	}
+
+	*outSize = bSize;
+	return uMatrix;
+}
+
+int** Intersection(int** matrix1, int size1, int** matrix2, int size2, int* outSize)
+{
+	int bSize = (size1 > size2) ? size1 : size2;
+	int** bMatrix = (size1 > size2) ? matrix1 : matrix2;
+
+	int lSize = (size1 > size2) ? size2 : size1;
+	int** lMatrix = (size1 > size2) ? matrix2 : matrix1;
+
+	int** iMatrix = GenerateMatrix(bSize, bSize);
+
+	for (size_t i = 0; i < lSize; i++)
+	{
+		for (size_t j = 0; j < lSize; j++)
+		{
+			int res = lMatrix[i][j] * bMatrix[i][j];
+			iMatrix[i][j] = res;
+		}
+	}
+
+	*outSize = bSize;
+	return iMatrix;
+}
+
+int** RoundSum(int** matrix1, int size1, int** matrix2, int size2, int* outSize)
+{
+	int bSize = (size1 > size2) ? size1 : size2;
+	int** bMatrix = (size1 > size2) ? matrix1 : matrix2;
+
+	int lSize = (size1 > size2) ? size2 : size1;
+	int** lMatrix = (size1 > size2) ? matrix2 : matrix1;
+
+	int** dMatrix = GenerateMatrix(lSize, lSize);
+
+	for (size_t i = 0; i < lSize; i++)
+	{
+		for (size_t j = 0; j < lSize; j++)
+		{
+			int res = lMatrix[i][j] == bMatrix[i][j] ? 0 : 1;
+			dMatrix[i][j] = res;
+		}
+	}
+
+	int rsSize = lSize;
+	int** rsMatrix = dMatrix;
+	for (size_t i = 0; i < lSize; i++)
+	{
+		int c = 0;
+		for (size_t j = 0; j < lSize; j++)
+		{
+			if (dMatrix[i][j] == 0)
+				c++;
+		}
+		if (c == lSize)
+			rsMatrix = RemoveRebro(rsMatrix, &rsSize, i);
+	}
+
+	*outSize = rsSize;
+	return rsMatrix;
+}
+
+#pragma endregion
+
 
 
 
