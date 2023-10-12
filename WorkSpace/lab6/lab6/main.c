@@ -22,6 +22,8 @@ int** Union(int** matrix1, int size1, int** matrix2, int size2, int* outSize);
 int** Intersection(int** matrix1, int size1, int** matrix2, int size2, int* outSize);
 int** RoundSum(int** matrix1, int size1, int** matrix2, int size2, int* outSize);
 
+int** Multiplication(int** matrix1, int size1, int** matrix2, int size2, int* sizeOut);
+
 int main()
 {
 	printf("--- Matrix 1 ---\n");
@@ -39,7 +41,7 @@ int main()
 	scanf("%d", &matrixSize2);
 	printf("-------\n");
 	int** matrix2 = GenerateAdjacencyMatrix(matrixSize2);
-	PrintMatrix(matrix2, matrixSize2, matrixSize2);
+	//PrintMatrix(matrix2, matrixSize2, matrixSize2);
 	printf("-------\n");
 
 	/*DataType** matrixL1 = GenerateListMatrix(matrix1, matrixSize1);
@@ -72,9 +74,26 @@ int main()
 	int** iMatrix = Intersection(matrix1, matrixSize1, matrix2, matrixSize2, &iSize);
 	PrintMatrix(iMatrix, iSize, iSize);*/
 
-	int rsSize = 0;
+	/*int rsSize = 0;
 	int** rsMatrix = RoundSum(matrix1, matrixSize1, matrix2, matrixSize2, &rsSize);
-	PrintMatrix(rsMatrix, rsSize, rsSize);
+	PrintMatrix(rsMatrix, rsSize, rsSize);*/
+
+	int** m3 = GenerateMatrix(matrixSize2, matrixSize2);
+	m3[0][0] = 0;
+	m3[0][1] = 1;
+	m3[0][2] = 0;
+	m3[1][0] = 1;
+	m3[1][1] = 0;
+	m3[1][2] = 1;
+	m3[2][0] = 0;
+	m3[2][1] = 1;
+	m3[2][2] = 0;
+	PrintMatrix(m3, matrixSize2, matrixSize2);
+	printf("-------\n");
+
+	int mSize = 0;
+	int** mMatrix = Multiplication(matrix1, matrixSize1, m3, matrixSize2, &mSize);
+	PrintMatrix(mMatrix, mSize, mSize);
 
 	return 0;
 }
@@ -272,19 +291,6 @@ int** Identification(int** matrix, int* size, int x, int y)
 			nMatrix[s - 2][d] = 1;
 			nMatrix[d][s - 2] = 1;
 		}
-		d++;
-	}
-
-	d = 0;
-	for (int i = 0; i < s; i++)
-	{
-		if (i == x || i == y)
-			i++;
-		if (i == x || i == y)
-			i++;
-
-		if (i >= s)
-			break;
 
 		if (matrix[y][i] == 1)
 		{
@@ -293,7 +299,6 @@ int** Identification(int** matrix, int* size, int x, int y)
 		}
 		d++;
 	}
-
 	*size = *size - 1;
 	return nMatrix;
 }
@@ -509,8 +514,6 @@ DataType** SplittingL(DataType** matrix, int* size, int x, int y)
 #pragma endregion
 
 #pragma region Third Number
-
-
 int** Union(int** matrix1, int size1, int** matrix2, int size2, int* outSize)
 {
 	int bSize = (size1 > size2) ? size1 : size2;
@@ -599,6 +602,60 @@ int** RoundSum(int** matrix1, int size1, int** matrix2, int size2, int* outSize)
 }
 
 #pragma endregion
+
+#pragma region Fourth Number
+int CheckUnion(int** matrix1, int size1, int** matrix2, int size2, int i, int j)
+{
+	int res = 0;
+
+	int bSize = (size1 > size2) ? size1 : size2;
+	int** bMatrix = (size1 > size2) ? matrix1 : matrix2;
+
+	int lSize = (size1 > size2) ? size2 : size1;
+	int** lMatrix = (size1 > size2) ? matrix2 : matrix1;
+
+
+	int li = i % lSize;
+	int lj = j % lSize;
+
+	int bi = i % bSize;
+	int bj = j % bSize;
+
+	if (bMatrix[bi][bj] == lMatrix[li][lj])
+	{
+		if (bi == bj || li == lj)
+			return 0;
+		res = 1;
+	}
+
+	return res;
+}
+
+int** Multiplication(int** matrix1, int size1, int** matrix2, int size2, int* sizeOut)
+{
+	*sizeOut = size1 * size2;
+	int s = *sizeOut;
+	int** mMatrix = GenerateMatrix(s, s);
+
+	int bSize = (size1 > size2) ? size1 : size2;
+	int** bMatrix = (size1 > size2) ? matrix1 : matrix2;
+
+	int lSize = (size1 > size2) ? size2 : size1;
+	int** lMatrix = (size1 > size2) ? matrix2 : matrix1;
+
+	for (size_t i = 0; i < s; i++)
+	{
+		for (size_t j = 0; j < s; j++)
+		{
+			mMatrix[i][j] = CheckUnion(matrix1, size1, matrix2, size2, i, j);
+		}
+	}
+
+	return mMatrix;
+}
+
+#pragma endregion
+
 
 
 
