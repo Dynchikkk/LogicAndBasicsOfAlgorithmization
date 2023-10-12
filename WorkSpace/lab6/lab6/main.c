@@ -1,6 +1,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include "list.h"
 
 int** GenerateMatrix(int size_x, int size_y);
@@ -26,74 +27,142 @@ int** Multiplication(int** matrix1, int size1, int** matrix2, int size2, int* si
 
 int main()
 {
-	printf("--- Matrix 1 ---\n");
+	srand(time(NULL));
+
 	int matrixSize1 = 0;
-	printf("Insert size of first array: ");
+	printf("Insert size of first matrix: ");
 	scanf("%d", &matrixSize1);
-	printf("-------\n");
 	int** matrix1 = GenerateAdjacencyMatrix(matrixSize1);
+	printf("--- Matrix 1 ---\n");
 	PrintMatrix(matrix1, matrixSize1, matrixSize1);
 	printf("-------\n");
 
-	printf("--- Matrix 2 ---\n");
 	int matrixSize2 = 0;
-	printf("Insert size of first array: ");
+	printf("Insert size of second matrix: ");
 	scanf("%d", &matrixSize2);
-	printf("-------\n");
 	int** matrix2 = GenerateAdjacencyMatrix(matrixSize2);
-	//PrintMatrix(matrix2, matrixSize2, matrixSize2);
+	printf("--- Matrix 2 ---\n");
+	PrintMatrix(matrix2, matrixSize2, matrixSize2);
 	printf("-------\n");
 
-	/*DataType** matrixL1 = GenerateListMatrix(matrix1, matrixSize1);
-	DataType** matrixL2 = GenerateListMatrix(matrix2, matrixSize2); */
-	/*printf("--- List Matrix 1---\n");
-	PrintListMatrix(matrixL1, matrixSize1);
-	printf("-------\n");*/
-	/*printf("--- List Matrix 2---\n");
-	PrintListMatrix(matrixL2, matrixSize2);
-	printf("-------\n");*/
-
-	/*matrix2 = Identification(matrix2, &matrixSize2, 0, 3);
-	PrintMatrix(matrix2, matrixSize2, matrixSize2);*/
-	/*matrix2 = Tightening(matrix2, &matrixSize2, 0, 1);
-	PrintMatrix(matrix2, matrixSize2, matrixSize2);*/
-	/*matrix2 = Splitting(matrix2, &matrixSize2, 0, 1);
-	PrintMatrix(matrix2, matrixSize2, matrixSize2);*/
-	/*matrixL2 = IdentificationL(matrixL2, &matrixSize2, 0, 3);
-	PrintListMatrix(matrixL2, matrixSize2);*/
-	/*matrixL2 = TighteningL(matrixL2, &matrixSize2,  0, 1);
-	PrintListMatrix(matrixL2, matrixSize2);*/
-	/*matrixL2 = SplittingL(matrixL2, &matrixSize2,  0, 1);
-	PrintListMatrix(matrixL2, matrixSize2);*/
-
-	/*int uSize = 0;
-	int** uMatrix = Union(matrix1, matrixSize1, matrix2, matrixSize2, &uSize);
-	PrintMatrix(uMatrix, uSize, uSize);*/
-
-	/*int iSize = 0;
-	int** iMatrix = Intersection(matrix1, matrixSize1, matrix2, matrixSize2, &iSize);
-	PrintMatrix(iMatrix, iSize, iSize);*/
-
-	/*int rsSize = 0;
-	int** rsMatrix = RoundSum(matrix1, matrixSize1, matrix2, matrixSize2, &rsSize);
-	PrintMatrix(rsMatrix, rsSize, rsSize);*/
-
-	int** m3 = GenerateMatrix(matrixSize2, matrixSize2);
-	m3[0][0] = 0;
-	m3[0][1] = 1;
-	m3[0][2] = 0;
-	m3[1][0] = 1;
-	m3[1][1] = 0;
-	m3[1][2] = 1;
-	m3[2][0] = 0;
-	m3[2][1] = 1;
-	m3[2][2] = 0;
-	PrintMatrix(m3, matrixSize2, matrixSize2);
+	int matrixSizeL1 = matrixSize1;
+	int matrixSizeL2 = matrixSize2;
+	DataType** matrixL1 = GenerateListMatrix(matrix1, matrixSizeL1);
+	DataType** matrixL2 = GenerateListMatrix(matrix2, matrixSizeL2);
+	printf("--- List Matrix 1---\n");
+	PrintListMatrix(matrixL1, matrixSizeL1);
+	printf("-------\n");
+	printf("--- List Matrix 2---\n");
+	PrintListMatrix(matrixL2, matrixSizeL2);
 	printf("-------\n");
 
-	int mSize = 0;
-	int** mMatrix = Multiplication(matrix1, matrixSize1, m3, matrixSize2, &mSize);
-	PrintMatrix(mMatrix, mSize, mSize);
+	int answ = -1;
+	while (answ != 0)
+	{
+
+		printf("Choose Action\n1 - Identification\n2 - Tightening\n3 - Splitting\n");
+		printf("4 - Identification list\n5 - Tightening list\n6 - Splitting list\n7 - Union\n");
+		printf("8 - Intersection\n9 - RoundSum\n10 - Multiplication\n0 - exit\n");
+		scanf("%d", &answ);
+		system("cls");
+		switch (answ)
+		{
+			case 1:
+				printf("Identification matrix2. Row = 0, col = 3\n");
+				printf("-------\n");
+				matrix2 = Identification(matrix2, &matrixSize2, 0, 3);
+				PrintMatrix(matrix2, matrixSize2, matrixSize2);
+				printf("-------\n");
+				break;
+
+			case 2:
+				printf("Tightening matrix2. Row = 0, col = 1\n");
+				printf("-------\n");
+				matrix2 = Tightening(matrix2, &matrixSize2, 0, 1);
+				PrintMatrix(matrix2, matrixSize2, matrixSize2);
+				printf("-------\n");
+				break;
+
+			case 3:
+				printf("Splitting matrix2. Row = 0, col = 1\n");
+				printf("-------\n");
+				matrix2 = Splitting(matrix2, &matrixSize2, 0, 1);
+				PrintMatrix(matrix2, matrixSize2, matrixSize2);
+				printf("-------\n");
+				break;
+
+			case 4:
+				printf("Identification matrixList2. Row = 0, col = 3\n");
+				printf("-------\n");
+				matrixL2 = IdentificationL(matrixL2, &matrixSize2, 0, 3);
+				PrintListMatrix(matrixL2, matrixSize2);
+				printf("-------\n");
+				break;
+
+			case 5:
+				printf("Tightening matrixList2. Row = 0, col = 1\n");
+				printf("-------\n");
+				matrixL2 = TighteningL(matrixL2, &matrixSize2, 0, 1);
+				PrintListMatrix(matrixL2, matrixSize2);
+				printf("-------\n");
+				break;
+
+			case 6:
+				printf("Splitting matrixList2. Row = 0, col = 1\n");
+				printf("-------\n");
+				matrixL2 = SplittingL(matrixL2, &matrixSize2, 0, 1);
+				PrintListMatrix(matrixL2, matrixSize2);
+				printf("-------\n");
+				break;
+
+			case 7:
+			{
+				printf("Union matrix1 and matrix2\n");
+				printf("-------\n");
+				int uSize = 0;
+				int** uMatrix = Union(matrix1, matrixSize1, matrix2, matrixSize2, &uSize);
+				PrintMatrix(uMatrix, uSize, uSize);
+				printf("-------\n");
+				break;
+			}
+
+			case 8:
+			{
+				printf("Intersection matrix1 and matrix2\n");
+				printf("-------\n");
+				int iSize = 0;
+				int** iMatrix = Intersection(matrix1, matrixSize1, matrix2, matrixSize2, &iSize);
+				PrintMatrix(iMatrix, iSize, iSize);
+				printf("-------\n");
+				break;
+			}
+
+			case 9:
+			{
+				printf("Round sum matrix1 and matrix2\n");
+				printf("-------\n");
+				int rsSize = 0;
+				int** rsMatrix = RoundSum(matrix1, matrixSize1, matrix2, matrixSize2, &rsSize);
+				PrintMatrix(rsMatrix, rsSize, rsSize);
+				printf("-------\n");
+				break;
+			}
+
+			case 10:
+			{
+				printf("Multiplication matrix1 and matrix2\n");
+				printf("-------\n");
+				int mSize = 0;
+				int** mMatrix = Multiplication(matrix1, matrixSize1, matrix2, matrixSize2, &mSize);
+				PrintMatrix(mMatrix, mSize, mSize);
+				printf("-------\n");
+				break;
+			}
+
+			default:
+				break;
+		}
+	}
 
 	return 0;
 }
@@ -153,7 +222,7 @@ void PrintListMatrix(DataType** matrix, int size)
 	}
 }
 
-int** RemoveRebro(int** matrix, int* size, int r)
+int** RemoveVertex(int** matrix, int* size, int r)
 {
 	int s = *size;
 	int** nMatrix = GenerateMatrix(s - 1, s - 1);
@@ -594,7 +663,7 @@ int** RoundSum(int** matrix1, int size1, int** matrix2, int size2, int* outSize)
 				c++;
 		}
 		if (c == lSize)
-			rsMatrix = RemoveRebro(rsMatrix, &rsSize, i);
+			rsMatrix = RemoveVertex(rsMatrix, &rsSize, i);
 	}
 
 	*outSize = rsSize;
@@ -604,33 +673,6 @@ int** RoundSum(int** matrix1, int size1, int** matrix2, int size2, int* outSize)
 #pragma endregion
 
 #pragma region Fourth Number
-int CheckUnion(int** matrix1, int size1, int** matrix2, int size2, int i, int j)
-{
-	int res = 0;
-
-	int bSize = (size1 > size2) ? size1 : size2;
-	int** bMatrix = (size1 > size2) ? matrix1 : matrix2;
-
-	int lSize = (size1 > size2) ? size2 : size1;
-	int** lMatrix = (size1 > size2) ? matrix2 : matrix1;
-
-
-	int li = i % lSize;
-	int lj = j % lSize;
-
-	int bi = i % bSize;
-	int bj = j % bSize;
-
-	if (bMatrix[bi][bj] == lMatrix[li][lj])
-	{
-		if (bi == bj || li == lj)
-			return 0;
-		res = 1;
-	}
-
-	return res;
-}
-
 int** Multiplication(int** matrix1, int size1, int** matrix2, int size2, int* sizeOut)
 {
 	*sizeOut = size1 * size2;
@@ -643,21 +685,33 @@ int** Multiplication(int** matrix1, int size1, int** matrix2, int size2, int* si
 	int lSize = (size1 > size2) ? size2 : size1;
 	int** lMatrix = (size1 > size2) ? matrix2 : matrix1;
 
-	for (size_t i = 0; i < s; i++)
+	int n = 0, m = 0;
+	for (size_t i = 0; i < lSize; i++)
 	{
-		for (size_t j = 0; j < s; j++)
+		for (size_t k = 0; k < bSize; k++)
 		{
-			mMatrix[i][j] = CheckUnion(matrix1, size1, matrix2, size2, i, j);
+			for (size_t j = 0; j < lSize; j++)
+			{
+				for (size_t l = 0; l < bSize; l++)
+				{
+					if (i == j)
+					{
+						if (bMatrix[k][l] == 1)
+							mMatrix[n][m] = 1;
+					}
+					else if (k == l)
+					{
+						if(lMatrix[i][j] == 1)
+							mMatrix[n][m] = 1;
+					}
+					m++;
+				}
+			}
+			n++;
+			m = 0;
 		}
 	}
 
 	return mMatrix;
 }
-
 #pragma endregion
-
-
-
-
-
-
