@@ -153,17 +153,7 @@ int main()
 				printf("Multiplication matrix1 and matrix2\n");
 				printf("-------\n");
 				int mSize = 0;
-				int** m3 = GenerateMatrix(matrixSize2, matrixSize2);
-				m3[0][0] = 0;
-				m3[0][1] = 1;
-				m3[0][2] = 0;
-				m3[1][0] = 1;
-				m3[1][1] = 0;
-				m3[1][2] = 1;
-				m3[2][0] = 0;
-				m3[2][1] = 1;
-				m3[2][2] = 0;
-				int** mMatrix = Multiplication(matrix1, matrixSize1, m3, matrixSize2, &mSize);
+				int** mMatrix = Multiplication(matrix1, matrixSize1, matrix2, matrixSize2, &mSize);
 				PrintMatrix(mMatrix, mSize, mSize);
 				printf("-------\n");
 				break;
