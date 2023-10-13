@@ -27,7 +27,7 @@ int** Multiplication(int** matrix1, int size1, int** matrix2, int size2, int* si
 
 int main()
 {
-	srand(time(NULL));
+	//srand(time(NULL));
 
 	int matrixSize1 = 0;
 	printf("Insert size of first matrix: ");
@@ -153,7 +153,17 @@ int main()
 				printf("Multiplication matrix1 and matrix2\n");
 				printf("-------\n");
 				int mSize = 0;
-				int** mMatrix = Multiplication(matrix1, matrixSize1, matrix2, matrixSize2, &mSize);
+				int** m3 = GenerateMatrix(matrixSize2, matrixSize2);
+				m3[0][0] = 0;
+				m3[0][1] = 1;
+				m3[0][2] = 0;
+				m3[1][0] = 1;
+				m3[1][1] = 0;
+				m3[1][2] = 1;
+				m3[2][0] = 0;
+				m3[2][1] = 1;
+				m3[2][2] = 0;
+				int** mMatrix = Multiplication(matrix1, matrixSize1, m3, matrixSize2, &mSize);
 				PrintMatrix(mMatrix, mSize, mSize);
 				printf("-------\n");
 				break;
@@ -685,31 +695,69 @@ int** Multiplication(int** matrix1, int size1, int** matrix2, int size2, int* si
 	int lSize = (size1 > size2) ? size2 : size1;
 	int** lMatrix = (size1 > size2) ? matrix2 : matrix1;
 
-	int n = 0, m = 0;
-	for (size_t i = 0; i < lSize; i++)
+	//int n = 0, m = 0;
+	//for (size_t i = 0; i < lSize; i++)
+	//{
+	//	for (size_t k = 0; k < bSize; k++)
+	//	{
+	//		for (size_t j = 0; j < lSize; j++)
+	//		{
+	//			for (size_t l = 0; l < bSize; l++)
+	//			{
+	//				if (i == j)
+	//				{
+	//					if (bMatrix[k][l] == 1)
+	//						mMatrix[n][m] = 1;
+	//				}
+	//				else if (k == l)
+	//				{
+	//					if(lMatrix[i][j] == 1)
+	//						mMatrix[n][m] = 1;
+	//				}
+	//				m++;
+	//			}
+	//		}
+	//		n++;
+	//		m = 0;
+	//	}
+	//}
+	int z1 = 0, v1 = 0;
+	int z2 = 0, v2 = 0;
+	for (size_t i = 0; i < s; i++)
 	{
-		for (size_t k = 0; k < bSize; k++)
+		// строки
+		if (i / bSize != z1)
+			z1++;
+		if (z1 >= lSize)
+			z1 = 0;
+		
+		if (v1 >= bSize)
+			v1 = 0;
+
+		for (size_t j = 0; j < s; j++)
 		{
-			for (size_t j = 0; j < lSize; j++)
+			// столбцы
+			if (j / bSize != z2)
+				z2++;
+			
+			if (v2 >= bSize)
+				v2 = 0;
+
+			if (z1 == z2)
 			{
-				for (size_t l = 0; l < bSize; l++)
-				{
-					if (i == j)
-					{
-						if (bMatrix[k][l] == 1)
-							mMatrix[n][m] = 1;
-					}
-					else if (k == l)
-					{
-						if(lMatrix[i][j] == 1)
-							mMatrix[n][m] = 1;
-					}
-					m++;
-				}
+				if (bMatrix[v1][v2] == 1)
+					mMatrix[i][j] = 1;
 			}
-			n++;
-			m = 0;
+			else if (v1 == v2)
+			{
+				if (lMatrix[z1][z2] == 1)
+					mMatrix[i][j] = 1;
+			}
+			v2 += 1;
 		}
+		z2 = 0;
+		v2 = 0;
+		v1 += 1;
 	}
 
 	return mMatrix;
