@@ -14,12 +14,16 @@ DataType** GenerateListMatrix(int** matrix, int size);
 void DFSadj(int** matrix, int matrixSize);
 void DFSlist(DataType** list, int listSize);
 
+void DFSNonRecursion(int** matrix, int size);
+
 int main()
 {
 	srand(time(NULL));
 
-	const int size = 4;
+	const int size = 9;
 	int** matrix = GenerateAdjacencyMatrix(size);
+
+	printf("Adjacency matrix:\n");
 	PrintMatrix(matrix, size, size);
 
 	printf("---- START DEPTH RUN ----\n");
@@ -28,10 +32,16 @@ int main()
 	printf("\n--------\n\n");
 
 	DataType** list = GenerateListMatrix(matrix, size);
+	printf("List matrix:\n");
 	PrintListMatrix(list, size);
 
 	printf("---- START DEPTH RUN ----\n");
 	DFSlist(list, size);
+
+	printf("\n--------\n\n");
+
+	printf("---- START NON RECURSION DEPTH RUN ----\n");
+	DFSNonRecursion(matrix, size);
 
 	return 0;
 }
@@ -244,7 +254,100 @@ void DFSlist(DataType** list, int listSize)
 	printf("\n");
 	free(vis);
 }
-
-
 #pragma endregion
+
+#pragma region SecondNumber
+typedef struct Stack
+{
+	int maxSize;
+	int* data;
+	size_t size;
+} Stack;
+
+Stack* CreateStack(int size)
+{
+	Stack* tmp = (Stack*)malloc(sizeof(Stack));
+	tmp -> data = (int*)malloc(sizeof(int) * size);
+	tmp -> maxSize = size;
+	tmp -> size = 0;
+	return tmp;
+}
+
+void Push(Stack* stack, int val)
+{
+	if (stack->size >= stack->maxSize) {
+		return;
+	}
+	stack->data[stack->size] = val;
+	stack->size++;
+}
+
+int* Pop(Stack* stack)
+{
+	if (stack->size <= 0) {
+		return NULL;
+	}
+	stack->size--;
+	return &(stack->data[stack->size]);
+}
+
+int IsStackEmpty(Stack* stack)
+{
+	if (stack->size <= 0)
+		return 0;
+	return 1;
+}
+
+void ClearStack(Stack* stack)
+{
+	free(stack->data);
+	free(stack);
+}
+
+void DFSNonRecursionLogic(int** matrix, int size, int vertex, int* visited)
+{
+	Stack* st = CreateStack(INT_MAX);
+
+	Push(st, vertex);
+
+	while (IsStackEmpty(st) == 1)
+	{
+		int* vert = Pop(st);
+		if (vert == NULL)
+			return;
+		vertex = *vert;
+
+		if (visited[vertex] == 1)
+			continue;
+		visited[vertex] = 1;
+		printf("%d ", vertex);
+		for (size_t i = 0; i < size; i++)
+		{
+			if (matrix[vertex][i] == 1 && visited[i] == 0)
+				Push(st, i);
+		}
+	}
+
+	ClearStack(st);
+}
+
+void DFSNonRecursion(int** matrix, int size)
+{
+	int* visited = (int*)calloc(size, sizeof(int));
+	DFSNonRecursionLogic(matrix, size, 0, visited);
+
+	for (int i = 0; i < size; i++)
+	{
+		if (visited[i] == 0)
+		{
+			printf("\n");
+			DFSNonRecursionLogic(matrix, size, i, visited);
+		}
+	}
+
+	printf("\n");
+	free(visited);
+}
+#pragma endregion
+
 
