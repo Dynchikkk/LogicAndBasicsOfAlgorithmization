@@ -1,4 +1,4 @@
-#include <stdio.h>
+﻿#include <stdio.h>
 #include <stdlib.h>
 #include <time.h>	
 #include "list.h"
@@ -15,10 +15,24 @@ void PrintListMatrix(DataType** matrix, int size);
 int** GenerateAdjacencyMatrix(int size);
 DataType** GenerateListMatrix(int** matrix, int size);
 
-void BFS(int** matrix, int size);
+void BFS(int** matrix, int size, int needPrint);
 void BFSList(DataType** list, int size);
 
-void BFSLocal(int** matrix, int size);
+void BFSLocal(int** matrix, int size, int needPrint);
+
+void AutoTest();
+
+double CalculateSpeed(void (*func)(int**, int, int), int** matrix, int size)
+{
+	double time_spent = 0.0;
+
+	clock_t begin = clock();
+	func(matrix, size, 0);
+	clock_t end = clock();
+
+	time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
+	return time_spent;
+}
 
 int main()
 {
@@ -31,9 +45,9 @@ int main()
 	PrintMatrix(matrix, size, size);
 
 	printf("---- START BFS RUN ----\n");
-	BFS(matrix, size);
+	BFS(matrix, size, 1);
 
-	printf("\n--------\n\n");
+	printf("\n");
 
 	DataType** list = GenerateListMatrix(matrix, size);
 	printf("List matrix:\n");
@@ -42,10 +56,13 @@ int main()
 	printf("---- START BFS RUN ----\n");
 	BFSList(list, size);
 
-	printf("\n--------\n\n");
+	printf("\n");
 
 	printf("---- START BFS LOCAL RUN ----\n");
-	BFSLocal(matrix, size);
+	BFSLocal(matrix, size, 1);
+
+	printf("\n------------- AUTO TEST --------------\n");
+	AutoTest();
 
 	return 0;
 }
@@ -185,7 +202,7 @@ DataType** GenerateListMatrix(int** matrix, int size)
 #pragma endregion
 
 #pragma region First Number
-void BFSLogic(int** matrix, int size, int vertex, int* used) 
+void BFSLogic(int** matrix, int size, int vertex, int* used, int needPrint)
 {
 	std::queue<int> q;
 	q.push(vertex);
@@ -196,7 +213,8 @@ void BFSLogic(int** matrix, int size, int vertex, int* used)
 		int cur = q.front();
 		q.pop();
 
-		printf("%d ", cur);
+		if(needPrint == 1)
+			printf("%d ", cur);
 
 		for (size_t i = 0; i < size; i++)
 		{
@@ -209,22 +227,24 @@ void BFSLogic(int** matrix, int size, int vertex, int* used)
 	}
 }
 
-void BFS(int** matrix, int size)
+void BFS(int** matrix, int size, int needPrint)
 {
 	int* used = (int*)calloc(size, sizeof(int));
 
-	BFSLogic(matrix, size, 0, used);
+	BFSLogic(matrix, size, 0, used , needPrint);
 
 	for (size_t i = 0; i < size; i++)
 	{
 		if (used[i] == 0)
 		{
-			printf("\n");
-			BFSLogic(matrix, size, i, used);
+			if(needPrint == 1)
+				printf("\n");
+			BFSLogic(matrix, size, i, used, needPrint);
 		}
 	}
 
-	printf("\n");
+	if (needPrint == 1)
+		printf("\n");
 	free(used);
 }
 
@@ -280,7 +300,7 @@ void BFSList(DataType** list, int size)
 #pragma endregion
 
 #pragma region Second Number
-void BFSLogicLocal(int** matrix, int size, int vertex, int* used)
+void BFSLogicLocal(int** matrix, int size, int vertex, int* used, int needPrint)
 {
 	DataType* q = CreateQueue(vertex);
 	used[vertex] = 1;
@@ -290,35 +310,63 @@ void BFSLogicLocal(int** matrix, int size, int vertex, int* used)
 		int cur;
 		q = Dequeue(q, &cur);
 
-		printf("%d ", cur);
+		if(needPrint == 1)
+			printf("%d ", cur);
 
 		for (size_t i = 0; i < size; i++)
 		{
 			if (matrix[vertex][i] == 1 && used[i] == 0)
 			{
-				Enqueue(i, q);
+				q = Enqueue(i, q);
 				used[i] = 1;
 			}
 		}
 	}
 }
 
-void BFSLocal(int** matrix, int size)
+void BFSLocal(int** matrix, int size, int needPrint)
 {
 	int* used = (int*)calloc(size, sizeof(int));
 
-	BFSLogic(matrix, size, 0, used);
+	BFSLogicLocal(matrix, size, 0, used, needPrint);
 
 	for (size_t i = 0; i < size; i++)
 	{
 		if (used[i] == 0)
 		{
-			printf("\n");
-			BFSLogic(matrix, size, i, used);
+			if (needPrint == 1)
+				printf("\n");
+			BFSLogicLocal(matrix, size, i, used, needPrint);
 		}
 	}
 
-	printf("\n");
+	if (needPrint == 1)
+		printf("\n");
 	free(used);
 }
 #pragma endregion
+
+#pragma region AutoTest
+void AutoTest() 
+{
+	printf("--------------------------------------\n");
+	printf("| size |time with class|time no class|\n");
+
+	for (size_t i = 1000; i <= 10000; i+= 1000)
+	{
+		
+		int** matrix = GenerateAdjacencyMatrix(i);
+
+		double def = CalculateSpeed(BFS, matrix, i);
+		double own = CalculateSpeed(BFSLocal, matrix, i);
+
+		printf("|%6d|", i);
+		printf("%12f s.", def);
+
+		ClearMatrix(matrix, i);
+		printf("|%10f s.|\n", own);
+	}
+	printf("--------------------------------------\n");
+}
+#pragma endregion
+

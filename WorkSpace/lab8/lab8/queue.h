@@ -4,7 +4,7 @@
 
 DataType* CreateQueue(int data);
 
-void Enqueue(int num, DataType* queue);
+DataType* Enqueue(int num, DataType* queue);
 
 DataType* Dequeue(DataType* queue, int* val);
 

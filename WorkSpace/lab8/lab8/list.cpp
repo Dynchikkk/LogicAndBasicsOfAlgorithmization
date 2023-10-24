@@ -130,7 +130,7 @@ int* TryCheckElementAt(int pos, DataType* head)
 {
 	if (IsDataTypeNull(head) == 1)
 	{
-		printf("ERROR: Null exception\n");
+		//printf("ERROR: Null exception\n");
 		return NULL;
 	}
 

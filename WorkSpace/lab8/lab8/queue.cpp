@@ -8,15 +8,16 @@ DataType* CreateQueue(int data)
 	return queue;
 }
 
-void Enqueue(int num, DataType* queue)
+DataType* Enqueue(int num, DataType* queue)
 {
 	if (IsDataTypeNull(queue) == 1)
 	{
-		printf("ERROR: Null exception\n");
-		return;
+		queue = CreateQueue(num);
+		return queue;
 	}
 
 	Add(num, queue);
+	return queue;
 }
 
 DataType* Dequeue(DataType* queue, int* val)
