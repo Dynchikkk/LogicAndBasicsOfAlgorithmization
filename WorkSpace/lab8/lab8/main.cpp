@@ -352,7 +352,7 @@ void AutoTest()
 	printf("--------------------------------------\n");
 	printf("| size |time with class|time no class|\n");
 
-	for (size_t i = 1000; i <= 10000; i+= 1000)
+	for (size_t i = 2000; i <= 20000; i+= 2000)
 	{
 		
 		int** matrix = GenerateAdjacencyMatrix(i);
