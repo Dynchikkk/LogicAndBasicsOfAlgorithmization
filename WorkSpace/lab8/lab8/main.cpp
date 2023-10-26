@@ -1,4 +1,6 @@
-﻿#include <stdio.h>
+﻿#define _CRT_SECURE_NO_WARNINGS
+
+#include <stdio.h>
 #include <stdlib.h>
 #include <time.h>	
 #include "list.h"
@@ -15,19 +17,19 @@ void PrintListMatrix(DataType** matrix, int size);
 int** GenerateAdjacencyMatrix(int size);
 DataType** GenerateListMatrix(int** matrix, int size);
 
-void BFS(int** matrix, int size, int needPrint);
-void BFSList(DataType** list, int size);
+void BFS(int** matrix, int size, int needPrint, int entryPoint);
+void BFSList(DataType** list, int size, int entryPoint);
 
-void BFSLocal(int** matrix, int size, int needPrint);
+void BFSLocal(int** matrix, int size, int needPrint, int entryPoint);
 
 void AutoTest();
 
-double CalculateSpeed(void (*func)(int**, int, int), int** matrix, int size)
+double CalculateSpeed(void (*func)(int**, int, int, int), int** matrix, int size)
 {
 	double time_spent = 0.0;
 
 	clock_t begin = clock();
-	func(matrix, size, 0);
+	func(matrix, size, 0, 0);
 	clock_t end = clock();
 
 	time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
@@ -44,8 +46,12 @@ int main()
 	printf("Adjacency matrix:\n");
 	PrintMatrix(matrix, size, size);
 
-	printf("---- START BFS RUN ----\n");
-	BFS(matrix, size, 1);
+	printf("\nInsert entry point: ");
+	int entryPoint = 0;
+	scanf("%d", &entryPoint);
+
+	printf("\n---- START BFS RUN ----\n");
+	BFS(matrix, size, 1, entryPoint);
 
 	printf("\n");
 
@@ -54,12 +60,12 @@ int main()
 	PrintListMatrix(list, size);
 
 	printf("---- START BFS RUN ----\n");
-	BFSList(list, size);
+	BFSList(list, size, entryPoint);
 
 	printf("\n");
 
 	printf("---- START BFS LOCAL RUN ----\n");
-	BFSLocal(matrix, size, 1);
+	BFSLocal(matrix, size, 1, entryPoint);
 
 	printf("\n------------- AUTO TEST --------------\n");
 	AutoTest();
@@ -227,11 +233,11 @@ void BFSLogic(int** matrix, int size, int vertex, int* used, int needPrint)
 	}
 }
 
-void BFS(int** matrix, int size, int needPrint)
+void BFS(int** matrix, int size, int needPrint, int entryPoint)
 {
 	int* used = (int*)calloc(size, sizeof(int));
 
-	BFSLogic(matrix, size, 0, used , needPrint);
+	BFSLogic(matrix, size, entryPoint, used , needPrint);
 
 	for (size_t i = 0; i < size; i++)
 	{
@@ -279,11 +285,11 @@ void BFSLogicList(DataType** list, int size, int vertex, int* used)
 	}
 }
 
-void BFSList(DataType** list, int size)
+void BFSList(DataType** list, int size, int entryPoint)
 {
 	int* used = (int*)calloc(size, sizeof(int));
 
-	BFSLogicList(list, size, 0, used);
+	BFSLogicList(list, size, entryPoint, used);
 
 	for (size_t i = 0; i < size; i++)
 	{
@@ -324,11 +330,11 @@ void BFSLogicLocal(int** matrix, int size, int vertex, int* used, int needPrint)
 	}
 }
 
-void BFSLocal(int** matrix, int size, int needPrint)
+void BFSLocal(int** matrix, int size, int needPrint, int entryPoint)
 {
 	int* used = (int*)calloc(size, sizeof(int));
 
-	BFSLogicLocal(matrix, size, 0, used, needPrint);
+	BFSLogicLocal(matrix, size, entryPoint, used, needPrint);
 
 	for (size_t i = 0; i < size; i++)
 	{

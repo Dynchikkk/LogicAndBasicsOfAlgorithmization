@@ -1,3 +1,5 @@
+#define _CRT_SECURE_NO_WARNINGS
+
 #include <stdio.h>
 #include <time.h>
 #include <stdlib.h>
@@ -11,23 +13,28 @@ void PrintListMatrix(DataType** matrix, int size);
 int** GenerateAdjacencyMatrix(int size);
 DataType** GenerateListMatrix(int** matrix, int size);
 
-void DFSadj(int** matrix, int matrixSize);
-void DFSlist(DataType** list, int listSize);
+void DFSadj(int** matrix, int matrixSize, int pointEntry);
+void DFSlist(DataType** list, int listSize, int pointEntry);
 
-void DFSNonRecursion(int** matrix, int size);
+void DFSNonRecursion(int** matrix, int size, int pointEntry);
 
 int main()
 {
 	srand(time(NULL));
 
-	const int size = 9;
+	const int size = 6;
 	int** matrix = GenerateAdjacencyMatrix(size);
 
 	printf("Adjacency matrix:\n");
 	PrintMatrix(matrix, size, size);
 
+	printf("\nInsert entry point: ");
+	int entryPoint = 0;
+	scanf("%d", &entryPoint);
+
 	printf("---- START DEPTH RUN ----\n");
-	DFSadj(matrix, size);
+	
+	DFSadj(matrix, size, entryPoint);
 
 	printf("\n--------\n\n");
 
@@ -36,12 +43,12 @@ int main()
 	PrintListMatrix(list, size);
 
 	printf("---- START DEPTH RUN ----\n");
-	DFSlist(list, size);
+	DFSlist(list, size, entryPoint);
 
 	printf("\n--------\n\n");
 
 	printf("---- START NON RECURSION DEPTH RUN ----\n");
-	DFSNonRecursion(matrix, size);
+	DFSNonRecursion(matrix, size, entryPoint);
 
 	return 0;
 }
@@ -195,11 +202,11 @@ void DFSCuroadj(int start, int* visited, int** matrix, int matrixSize)
 	}
 }
 
-void DFSadj(int** matrix, int matrixSize)
+void DFSadj(int** matrix, int matrixSize, int pointEntry)
 {
 	int* vis = (int*)calloc(matrixSize, sizeof(int));
 
-	DFSCuroadj(0, vis, matrix, matrixSize);
+	DFSCuroadj(pointEntry, vis, matrix, matrixSize);
 
 	for (int i = 0; i < matrixSize; i++)
 	{
@@ -237,10 +244,10 @@ void DFSCurolist(int start, int* visited, DataType** list, int listSize)
 	}
 }
 
-void DFSlist(DataType** list, int listSize)
+void DFSlist(DataType** list, int listSize, int entryPoint)
 {
 	int* vis = (int*)calloc(listSize, sizeof(int));
-	DFSCurolist(0, vis, list, listSize);
+	DFSCurolist(entryPoint, vis, list, listSize);
 
 	for (int i = 0; i < listSize; i++)
 	{
@@ -306,9 +313,10 @@ void ClearStack(Stack* stack)
 
 void DFSNonRecursionLogic(int** matrix, int size, int vertex, int* visited)
 {
-	Stack* st = CreateStack(INT_MAX);
+	Stack* st = CreateStack(size * size);
 
 	Push(st, vertex);
+	visited[vertex] = 1;
 
 	while (IsStackEmpty(st) == 1)
 	{
@@ -317,24 +325,24 @@ void DFSNonRecursionLogic(int** matrix, int size, int vertex, int* visited)
 			return;
 		vertex = *vert;
 
-		if (visited[vertex] == 1)
-			continue;
-		visited[vertex] = 1;
 		printf("%d ", vertex);
 		for (size_t i = 0; i < size; i++)
 		{
 			if (matrix[vertex][i] == 1 && visited[i] == 0)
+			{
 				Push(st, i);
+				visited[i] = 1;
+			}
 		}
 	}
 
 	ClearStack(st);
 }
 
-void DFSNonRecursion(int** matrix, int size)
+void DFSNonRecursion(int** matrix, int size, int entryPoint)
 {
 	int* visited = (int*)calloc(size, sizeof(int));
-	DFSNonRecursionLogic(matrix, size, 0, visited);
+	DFSNonRecursionLogic(matrix, size, entryPoint, visited);
 
 	for (int i = 0; i < size; i++)
 	{
