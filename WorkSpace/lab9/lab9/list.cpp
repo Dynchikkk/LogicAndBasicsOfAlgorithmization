@@ -104,6 +104,7 @@ DataType* TryRemoveElementAt(int pos, DataType* head)
 		DataType* headEl = head;
 		head = headEl->next;
 		free(headEl);
+
 		return head;
 	}
 
@@ -123,6 +124,7 @@ DataType* TryRemoveElementAt(int pos, DataType* head)
 
 	tmp->next = l->next;
 	free(l);
+	l = NULL;
 	return head;
 }
 
@@ -191,6 +193,9 @@ DataType* Clear(DataType* dataType)
 	{
 		h = TryRemoveElementAt(0, h);
 	}
+
+	free(h);
+	h = NULL;
 
 	return h;
 }

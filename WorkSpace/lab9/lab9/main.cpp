@@ -15,12 +15,18 @@ int** GenerateAdjacencyMatrix(int size);
 DataType** GenerateListMatrix(int** matrix, int size);
 
 void BFS(int** matrix, int size, int needPrint, int in, int out);
+void BFSList(DataType** list, int size, int needPrint, int in, int out);
+
+void DFSadj(int** matrix, int matrixSize, int needPrint, int in, int out);
+void DFSlist(DataType** list, int listSize, int in, int out, int needPrint);
+
+void AutoTest();
 
 int main()
 {
 	srand(time(NULL));
 
-	const int size = 5;
+	const int size = 7;
 	int** matrix = GenerateAdjacencyMatrix(size);
 
 	printf("Adjacency matrix:\n");
@@ -30,12 +36,24 @@ int main()
 	printf("List matrix:\n");
 	PrintListMatrix(list, size);
 
-	printf("Insert in and out vertex: ");
+	printf("\nInsert in and out vertex: ");
 	int in = 0, out = 0;
 	scanf("%d %d", &in, &out);
 
-	printf("\n");
+	printf("\nAdj matrix, find by BFS: ");
 	BFS(matrix, size, 1, in, out);
+
+	printf("\List matrix, find by BFS: ");
+	BFSList(list, size, 1, in, out);
+
+	printf("\nAdj matrix, find by DFS: ");
+	DFSadj(matrix, size, 1, in, out);
+
+	printf("\List matrix, find by DFS: ");
+	DFSlist(list, size, in, out, 1);
+
+	printf("\n");
+	AutoTest();
 
 	return 0;
 }
@@ -152,7 +170,7 @@ DataType* BFSLogic(int** matrix, int size, int in, int out, int* used, int* path
 	memset(dst, -1, size * sizeof(int));
 
 	int* pr = (int*)malloc(size* sizeof(int));
-	memset(pr, NULL, size * sizeof(int));
+	memset(pr, -1, size * sizeof(int));
 
 	q.push(in);
 	used[in] = 1;
@@ -178,7 +196,7 @@ DataType* BFSLogic(int** matrix, int size, int in, int out, int* used, int* path
 	int cur = out;
 	DataType* path = CreateDataType(cur);
 
-	while (cur != in)
+	while (pr[cur] != -1)
 	{
 		cur = pr[cur];
 		Add(cur, path);
@@ -202,39 +220,47 @@ void BFS(int** matrix, int size, int needPrint, int in, int out)
 
 	int count = 0;
 	DataType* path = BFSLogic(matrix, size, in, out, used, &count);
-	printf("\n");
 
-	if (count == NULL)
+	if (needPrint)
 	{
-		printf("There is no path\n");
-	}
-	else 
-	{
-		for (size_t i = 0, j = count - 1; i < count; i++, j--)
+		if (count == 1)
+			printf("There is no path\n");
+		else
 		{
-			printf("%d ", *TryCheckElementAt(j, path));
+			for (size_t i = 0, j = count - 1; i < count; i++, j--)
+			{
+				printf("%d ", *TryCheckElementAt(j, path));
+			}
+			printf("\n");
 		}
-		printf("\n");
 	}
 
 	free(used);
+	path = Clear(path);
+	free(path);
 }
 
-void BFSLogicList(DataType** list, int size, int vertex, int* used)
+DataType* BFSLogicList(DataType** list, int size, int in, int out, int* used, int* pathSize)
 {
 	std::queue<int> q;
-	q.push(vertex);
-	used[vertex] = 1;
+
+	int* dst = (int*)malloc(size * sizeof(int));
+	memset(dst, -1, size * sizeof(int));
+
+	int* pr = (int*)malloc(size * sizeof(int));
+	memset(pr, -1, size * sizeof(int));
+
+	q.push(in);
+	used[in] = 1;
+	dst[in] = 0;
 
 	while (!q.empty())
 	{
 		int cur = q.front();
 		q.pop();
 
-		printf("%d ", cur);
-
 		int i = 1;
-		int* v = TryCheckElementAt(i, list[vertex]);
+		int* v = TryCheckElementAt(i, list[cur]);
 		while (v != NULL)
 		{
 			if (v == NULL)
@@ -244,29 +270,222 @@ void BFSLogicList(DataType** list, int size, int vertex, int* used)
 			{
 				q.push(*v);
 				used[*v] = 1;
+				dst[*v] = dst[cur] + 1;
+				pr[*v] = cur;
 			}
 			i++;
-			v = TryCheckElementAt(i, list[vertex]);
+			v = TryCheckElementAt(i, list[cur]);
 		}
 	}
+
+	int cur = out;
+	DataType* path = CreateDataType(cur);
+
+	while (pr[cur] != -1)
+	{
+		cur = pr[cur];
+		Add(cur, path);
+	}
+
+	int* s = GetLength(path);
+	if (s == NULL)
+		*pathSize = 0;
+	else
+		*pathSize = *s;
+
+	free(dst);
+	free(pr);
+
+	return path;
 }
 
-void BFSList(DataType** list, int size, int entryPoint)
+void BFSList(DataType** list, int size, int needPrint, int in, int out)
 {
 	int* used = (int*)calloc(size, sizeof(int));
 
-	BFSLogicList(list, size, entryPoint, used);
+	int count = 0;
+	DataType* path = BFSLogicList(list, size, in, out, used, &count);
 
-	for (size_t i = 0; i < size; i++)
+	if (needPrint)
 	{
-		if (used[i] == 0)
+		if (count == 1)
+			printf("There is no path\n");
+		else
 		{
+			for (size_t i = 0, j = count - 1; i < count; i++, j--)
+			{
+				printf("%d ", *TryCheckElementAt(j, path));
+			}
 			printf("\n");
-			BFSLogicList(list, size, i, used);
 		}
 	}
 
-	printf("\n");
 	free(used);
+	path = Clear(path);
+	free(path);
 }
 #pragma endregion
+
+#pragma region Second Number
+int DFSCuroadj(int in, int out, int* visited, int** matrix, int matrixSize, std::vector<int>* path)
+{
+	visited[in] = 1;
+	int end = -1;
+
+	for (size_t r = 0; r <= matrixSize; r++)
+	{
+		if ((matrix[in][r] != 0) && (visited[r] == 0))
+		{
+			visited[in] = 1;
+			(*path).push_back(in);
+
+			if (r == out)
+			{
+				(*path).push_back(r);
+				return 1;
+			}
+
+			end = DFSCuroadj(r, out, visited, matrix, matrixSize, path);
+			if (end == 1)
+				return 1;
+		}
+	}
+	if (path->size() - 1 <= 0)
+		return 0;
+
+	visited[(*path)[(*path).size() - 1]] = 0;
+	path->erase(path->begin() + (path->size() - 1));
+	path->shrink_to_fit();
+	return 0;
+}
+
+void DFSadj(int** matrix, int matrixSize, int needPrint, int in, int out)
+{
+	int* vis = (int*)calloc(matrixSize, sizeof(int));
+
+	std::vector<int> path;
+
+	DFSCuroadj(in, out, vis, matrix, matrixSize, &path);
+
+	if (needPrint)
+	{
+		if (path.empty() || path.size() == 1)
+			printf("There is no way\n");
+		else
+		{
+			for (size_t i = 0; i < path.size(); i++)
+			{
+				printf("%d ", path[i]);
+			}
+			printf("\n");
+		}
+	}
+	free(vis);
+	path.clear();
+	path.shrink_to_fit();
+}
+
+int DFSCurolist(int in, int out, int* visited, DataType** list, int listSize, std::vector<int>* path)
+{
+	visited[in] = 1;
+
+	int i = 1;
+
+	int* v = TryCheckElementAt(i, list[in]);
+	while (v != NULL)
+	{
+		if (v == NULL)
+			break;
+
+		if (visited[*v] == 0)
+		{
+			visited[in] = 1;
+			(*path).push_back(in);
+
+			if (*v == out)
+			{
+				(*path).push_back(*v);
+				return 1;
+			}
+
+			int end = DFSCurolist(*v, out, visited, list, listSize, path);
+			if (end == 1)
+				return 1;
+		}
+
+		i++;
+		v = TryCheckElementAt(i, list[in]);
+	}
+
+	if (path->size() <= 0)
+		return 0;
+
+	visited[(*path)[(*path).size() - 1]] = 0;
+	path->erase(path->begin() + (path->size() - 1));
+	return 0;
+}
+
+void DFSlist(DataType** list, int listSize, int in, int out, int needPrint)
+{
+	int* vis = (int*)calloc(listSize, sizeof(int));
+
+	std::vector<int> path;
+
+	DFSCurolist(in, out, vis, list, listSize, &path);
+
+	if (needPrint)
+	{
+		if (path.empty() || path.size() == 1)
+			printf("There is no way\n");
+		else
+		{
+			for (size_t i = 0; i < path.size(); i++)
+			{
+				printf("%d ", path[i]);
+			}
+			printf("\n");
+		}
+	}
+
+	free(vis);
+}
+#pragma endregion
+
+#pragma region AutoTest
+double CalculateSpeed(void (*func)(int**, int, int, int, int), int** matrix, int size)
+{
+	double time_spent = 0.0;
+
+	clock_t begin = clock();
+	func(matrix, size, 0, 0, size -1);
+	clock_t end = clock();
+
+	time_spent += (double)(end - begin) / CLOCKS_PER_SEC;
+	return time_spent;
+}
+
+void AutoTest()
+{
+	int in, out;
+
+	printf("--------------------------------------\n");
+	printf("| size |      BFS      |     DFS     |\n");
+
+	for (int i = 500; i <= 7000; i += 500)
+	{
+		int** matrix = GenerateAdjacencyMatrix(i);
+
+		double bfs = CalculateSpeed(BFS, matrix, i - 1);
+		double dfs = CalculateSpeed(DFSadj, matrix, i - 1);
+	
+		printf("|%6d|", i);
+		printf("%12f s.", bfs);
+
+		ClearMatrix(matrix, i);
+		printf("|%10f s.|\n", dfs);
+	}
+	printf("--------------------------------------\n");
+}
+#pragma endregion
+
+
