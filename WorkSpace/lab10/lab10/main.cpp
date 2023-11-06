@@ -14,8 +14,7 @@ void PrintMatrix(int** matrix, int size_x, int size_y);
 int** GenerateMatrixDirected(int size);
 int** GenerateMatrixUnDirected(int size);
 
-void BFSUnDirected(int** matrix, int size, int in, int out);
-void BFSDirected(int** matrix, int size, int in, int out);
+void BFS(int** matrix, int size, int in, int out);
 
 int FindRadius(int** matrix, int size);
 int FindDiametr(int** matrix, int size);
@@ -45,19 +44,19 @@ int main()
 	
 	printf("\nrad = %d, diam = %d\n", FindRadius(matrixUnDir, size), FindDiametr(matrixUnDir, size));
 	printf("Center vert: ");
-	FindCenterVert(matrixDir, size);
+	FindCenterVert(matrixUnDir, size);
 	printf("Peref vert: ");
-	FindPerefVert(matrixDir, size);
+	FindPerefVert(matrixUnDir, size);
 
 	int in, out;
 	printf("\nInsert in and out vertex: ");
 	scanf("%d %d", &in, &out);
 
 	printf("\nWay in direct matrix: ");
-	BFSDirected(matrixDir, size, in, out);
+	BFS(matrixDir, size, in, out);
 
 	printf("Way in undirect matrix: ");
-	BFSUnDirected(matrixUnDir, size, in, out);
+	BFS(matrixUnDir, size, in, out);
 
 	return 0;
 }
@@ -178,7 +177,7 @@ int** GenerateMatrixDirected(int size)
 #pragma endregion
 
 #pragma region FirsNumber
-std::vector<int> BFSUnDirectedLogic(int** matrix, int size, int in, int out)
+std::vector<int> BFSLogic(int** matrix, int size, int in, int out)
 {
 	std::vector<int> dst (size, INT_MAX);
 	std::vector<int> pr (size, -1);
@@ -230,86 +229,6 @@ std::vector<int> BFSUnDirectedLogic(int** matrix, int size, int in, int out)
 	}
 
 	int len = 0;
-	for (int i = 0; i < path.size() - 1; i++)
-		len += matrix[path[i]][path[i + 1]];
-
-	path.push_back(len);
-
-	std::reverse(path.begin(), path.end());
-
-	return path;
-}
-
-void BFSUnDirected(int** matrix, int size, int in, int out)
-{
-	std::vector<int> path = BFSUnDirectedLogic(matrix, size, in, out);
-
-	if (path[0] <= 0)
-		printf("There is no way");
-	else
-	{
-		printf("Way: ");
-		for (int i = 1; i < path.size(); i++)
-		{
-			printf("%d ", path[i]);
-		}
-		printf("Len: %d", path[0]);
-	}
-
-	printf("\n");
-}
-
-std::vector<int> BFSDirectedLogic(int** matrix, int size, int in, int out)
-{
-	std::vector<int> dst(size, INT_MAX);
-	std::vector<int> pr(size, -1);
-
-	std::priority_queue<std::pair<int, int>, std::vector<std::pair<int, int>>, std::greater< std::pair<int, int>>> q;
-
-	dst[in] = 0;
-	q.push({ 0, in });
-
-	while (!q.empty())
-	{
-		std::pair<int, int> tmp = q.top();
-		q.pop();
-
-		int len = tmp.first;
-		int vert = tmp.second;
-
-		if (dst[vert] < len)
-			continue;
-
-		for (int i = 0; i < size; i++)
-		{
-			if (matrix[vert][i] > 0)
-			{
-				int cur = i;
-				int lenCur = matrix[vert][i];
-
-				int nLen = len + lenCur;
-
-				if (nLen < dst[cur])
-				{
-					dst[cur] = nLen;
-					pr[cur] = vert;
-					q.push({ nLen, cur });
-				}
-			}
-		}
-	}
-
-	int cur = out;
-	std::vector<int> path;
-	path.push_back(cur);
-
-	while (pr[cur] != -1)
-	{
-		cur = pr[cur];
-		path.push_back(cur);
-	}
-
-	int len = 0;
 	path.push_back(len);
 
 	std::reverse(path.begin(), path.end());
@@ -322,9 +241,9 @@ std::vector<int> BFSDirectedLogic(int** matrix, int size, int in, int out)
 	return path;
 }
 
-void BFSDirected(int** matrix, int size, int in, int out)
+void BFS(int** matrix, int size, int in, int out)
 {
-	std::vector<int> path = BFSDirectedLogic(matrix, size, in, out);
+	std::vector<int> path = BFSLogic(matrix, size, in, out);
 
 	if (path[0] <= 0)
 		printf("There is no way");
@@ -350,7 +269,10 @@ std::vector<int> MaxWeight(int** matrix, int size)
 	for (int i = 0; i < size; i++)
 	{
 		for (int j = 0; j < size; j++)
-			m[i] = std::max(m[i], matrix[i][j]);	
+		{
+			int len = BFSLogic(matrix, size, i, j)[0];
+			m[i] = std::max(m[i], len);
+		}
 	}
 
 	return m;
