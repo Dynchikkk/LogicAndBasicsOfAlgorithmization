@@ -1,11 +1,16 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
+#include <iostream>
 #include <stdlib.h>
 #include <time.h>	
+#include <algorithm>
+#include <string>
+#include <cstring>
 
 #include <queue>
 
 #define INF 10;
+#define CONSOLE
 
 int** GenerateMatrix(int size_x, int size_y);
 void ClearMatrix(int** matrix, int size);
@@ -22,11 +27,12 @@ int FindDiametr(int** matrix, int size);
 void FindCenterVert(int** matrix, int size);
 void FindPerefVert(int** matrix, int size);
 
-int main()
+int main(int argc, char* argv[])
 {
 	srand(time(NULL));
 
 	const int size = 4;
+	int in = 0, out = 0;
 
 	int** matrixDir = GenerateMatrixDirected(size);
 	printf("Directed Matrix: \n");
@@ -48,9 +54,23 @@ int main()
 	printf("Peref vert: ");
 	FindPerefVert(matrixUnDir, size);
 
-	int in, out;
+#ifndef CONSOLE
 	printf("\nInsert in and out vertex: ");
 	scanf("%d %d", &in, &out);
+#else
+	if (argc > 1)
+	{
+		for (int i = 0; i < argc; i++)
+		{
+			if (strcmp(argv[i], "-vertIn") == 0)
+				in = std::stoi(argv[i + 1]);
+			else if (strcmp(argv[i], "-vertOut") == 0)
+				out = std::stoi(argv[i + 1]);
+		}
+	}
+
+	printf("\nIn and out vertex: %d %d", in, out);
+#endif
 
 	printf("\nWay in direct matrix: ");
 	BFS(matrixDir, size, in, out);
