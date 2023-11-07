@@ -10,7 +10,7 @@
 #include <queue>
 
 #define INF 10;
-#define CONSOLE
+//#define CONSOLE
 
 int** GenerateMatrix(int size_x, int size_y);
 void ClearMatrix(int** matrix, int size);
