@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <string>
 #include <cstring>
+#include <numeric>
 
 #include <queue>
 
@@ -16,8 +17,8 @@ int** GenerateMatrix(int size_x, int size_y);
 void ClearMatrix(int** matrix, int size);
 void PrintMatrix(int** matrix, int size_x, int size_y);
 
-int** GenerateMatrixDirected(int size);
-int** GenerateMatrixUnDirected(int size);
+int** GenerateMatrixDirected(int size, bool vz);
+int** GenerateMatrixUnDirected(int size, bool vz);
 
 void BFS(int** matrix, int size, int in, int out);
 
@@ -27,37 +28,16 @@ int FindDiametr(int** matrix, int size);
 void FindCenterVert(int** matrix, int size);
 void FindPerefVert(int** matrix, int size);
 
+void FindCenterOfGrav(int** matrix, int size);
+
 int main(int argc, char* argv[])
 {
 	srand(time(NULL));
 
 	const int size = 4;
 	int in = 0, out = 0;
+	int vz = 1, dir = 1;
 
-	int** matrixDir = GenerateMatrixDirected(size);
-	printf("Directed Matrix: \n");
-	PrintMatrix(matrixDir, size, size);
-
-	printf("\nrad = %d, diam = %d\n", FindRadius(matrixDir, size), FindDiametr(matrixDir, size));
-	printf("Center vert: ");
-	FindCenterVert(matrixDir, size);
-	printf("Peref vert: ");
-	FindPerefVert(matrixDir, size);
-
-	int** matrixUnDir = GenerateMatrixUnDirected(size);
-	printf("\nUnDirected Matrix: \n");
-	PrintMatrix(matrixUnDir, size, size);
-	
-	printf("\nrad = %d, diam = %d\n", FindRadius(matrixUnDir, size), FindDiametr(matrixUnDir, size));
-	printf("Center vert: ");
-	FindCenterVert(matrixUnDir, size);
-	printf("Peref vert: ");
-	FindPerefVert(matrixUnDir, size);
-
-#ifndef CONSOLE
-	printf("\nInsert in and out vertex: ");
-	scanf("%d %d", &in, &out);
-#else
 	if (argc > 1)
 	{
 		for (int i = 0; i < argc; i++)
@@ -66,17 +46,64 @@ int main(int argc, char* argv[])
 				in = std::stoi(argv[i + 1]);
 			else if (strcmp(argv[i], "-vertOut") == 0)
 				out = std::stoi(argv[i + 1]);
+			else if (strcmp(argv[i], "-vz") == 0)
+				vz = std::stoi(argv[i + 1]);
+			else if (strcmp(argv[i], "-dir") == 0)
+				dir = std::stoi(argv[i + 1]);
 		}
+
+		printf("\nIn and out vertex: %d %d\n", in, out);
+	}
+	else
+	{
+		printf("Vzvesh? Directed? (0 - false, 1 - true):");
+		scanf("%d %d", &vz, &dir);
 	}
 
-	printf("\nIn and out vertex: %d %d", in, out);
-#endif
+	if (dir == 1)
+	{
+		int** matrixDir = GenerateMatrixDirected(size, vz == 1 ? true : false);
+		printf("Directed Matrix: \n");
+		PrintMatrix(matrixDir, size, size);
 
-	printf("\nWay in direct matrix: ");
-	BFS(matrixDir, size, in, out);
+		printf("\nrad = %d, diam = %d\n", FindRadius(matrixDir, size), FindDiametr(matrixDir, size));
+		printf("Center vert: ");
+		FindCenterVert(matrixDir, size);
+		printf("Peref vert: ");
+		FindPerefVert(matrixDir, size);
+		FindCenterOfGrav(matrixDir, size);
 
-	printf("Way in undirect matrix: ");
-	BFS(matrixUnDir, size, in, out);
+		if (argc <= 1)
+		{
+			printf("\nInsert in and out vertex: ");
+			scanf("%d %d", &in, &out);
+		}
+
+		printf("\nWay in direct matrix: ");
+		BFS(matrixDir, size, in, out);
+	}
+	else
+	{
+		int** matrixUnDir = GenerateMatrixUnDirected(size, vz == 1 ? true : false);
+		printf("\nUnDirected Matrix: \n");
+		PrintMatrix(matrixUnDir, size, size);
+
+		printf("\nrad = %d, diam = %d\n", FindRadius(matrixUnDir, size), FindDiametr(matrixUnDir, size));
+		printf("Center vert: ");
+		FindCenterVert(matrixUnDir, size);
+		printf("Peref vert: ");
+		FindPerefVert(matrixUnDir, size);
+		FindCenterOfGrav(matrixUnDir, size);
+
+		if (argc <= 1)
+		{
+			printf("\nInsert in and out vertex: ");
+			scanf("%d %d", &in, &out);
+		}
+
+		printf("Way in undirect matrix: ");
+		BFS(matrixUnDir, size, in, out);
+	}
 
 	return 0;
 }
@@ -130,7 +157,7 @@ void PrintMatrix(int** matrix, int size_x, int size_y)
 #pragma endregion
 
 #pragma region  MatrixGenerate
-int** GenerateMatrixUnDirected(int size)
+int** GenerateMatrixUnDirected(int size, bool vz)
 {
 	int** matrix = GenerateMatrix(size, size);
 
@@ -145,6 +172,8 @@ int** GenerateMatrixUnDirected(int size)
 				continue;
 
 			int rnd = rand() % INF;
+			if (vz == false)
+				rnd = rand() % 2;
 			int isZero = rand() % 2;
 			if (isZero == 0)
 				rnd = 0;
@@ -157,7 +186,7 @@ int** GenerateMatrixUnDirected(int size)
 	return matrix;
 }
 
-int** GenerateMatrixDirected(int size)
+int** GenerateMatrixDirected(int size, bool vz)
 {
 	int** matrix = GenerateMatrix(size, size);
 
@@ -172,6 +201,9 @@ int** GenerateMatrixDirected(int size)
 				continue;
 
 			int rnd = rand() % INF;
+			if (vz == false)
+				rnd = rand() % 2;
+
 			int side = rand() % 3;
 
 			switch (side)
@@ -248,15 +280,12 @@ std::vector<int> BFSLogic(int** matrix, int size, int in, int out)
 		path.push_back(cur);
 	}
 
-	int len = 0;
+	int len = dst[out];
+	if (len == INT_MAX)
+		len = 0;
 	path.push_back(len);
 
 	std::reverse(path.begin(), path.end());
-
-	for (int i = 1; i < path.size() - 1; i++)
-		len += matrix[path[i]][path[i + 1]];
-
-	path[0] = len;
 
 	return path;
 }
@@ -355,5 +384,49 @@ void FindPerefVert(int** matrix, int size)
 }
 
 #pragma endregion
+
+#pragma region Dop
+std::vector<int> FindDist(int** matrix, int size, int in)
+{
+	std::vector<int> w(size, 0);
+	for (size_t i = 0; i < size; i++)
+	{
+		int len = BFSLogic(matrix, size, in, i)[0];
+		w[i] = len;
+	}
+
+	return w;
+}
+
+void FindCenterOfGrav(int** matrix, int size)
+{
+	std::vector<int> w(size, 0);
+	for (size_t i = 0; i < size; i++)
+	{
+		std::vector<int> m = FindDist(matrix, size, i);
+		printf("Dist %d: ", i);
+		for (size_t j = 0; j < size; j++)
+		{
+			printf("%d ", m[j]);
+			w[i] += m[j];
+		}
+		printf("\n");
+	}
+
+	int min = w[0];
+	int cov = 0;
+	for (size_t i = 1; i < size; i++)
+	{
+		if (w[i] < min)
+		{
+			cov = i;
+			min = w[i];
+		}
+	}
+
+	printf("Center of Gravity = %d, Weight = %d\n", cov, min);
+}
+#pragma endregion
+
 
 
