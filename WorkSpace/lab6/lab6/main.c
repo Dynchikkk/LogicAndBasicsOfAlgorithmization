@@ -27,7 +27,7 @@ int** Multiplication(int** matrix1, int size1, int** matrix2, int size2, int* si
 
 int main()
 {
-	//srand(time(NULL));
+	srand(time(NULL));
 
 	int matrixSize1 = 0;
 	printf("Insert size of first matrix: ");
